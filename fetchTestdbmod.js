@@ -44,11 +44,12 @@ function avgCapacity(row) {
       const average = total / rows.length;
       let current = row.site_capacity;
       // console.log("average", average)
-
+			const startTime = Date.now()
       return new Promise((resolve) => {
         function loop() {
           if (current >= average) {
             row.site_capacity = current;
+						const timeUpgrade = (Date.now() - startTime)/1000
             return logtotestdb({
               delayTime: 0,
               plant_id: row.id,
@@ -56,21 +57,32 @@ function avgCapacity(row) {
               comnc_date: row.comm_date,
               capacity: current,
               message: `Plant id ${row.id} capacity reached average value of ${current}. `,
-            }).then(() => resolve(row));
+            })
+						.then(()=>{logtotestdb({
+							delayTime: 0,
+							plant_id: row.id,
+							plant_name: row.name,
+							comnc_date: row.comm_date,
+							capacity: current,
+							message: `Total time taken to upgrade plant id ${row.id} is ${timeUpgrade}`,
+						})})
+						.then(() => resolve(row));
           } else {
             const t1 = Date.now() % 2000;
             delayTimelog(t1, 10, "log", "2025-05-20", 0, `Delaying for  ${t1} ms while upgrading.`)
               .then(() => {
                 const previous = current;
                 current = current + 3;
-                return logtotestdb({
+
+              	logtotestdb({
                   delayTime: 0,
                   plant_id: row.id,
                   plant_name: row.name,
                   comnc_date: row.comm_date,
                   capacity: current,
                   message: `Plant capacity of id ${row.id} incremented from ${previous} to ${current}.`,
-                });
+                })
+								
               })
               .then(() => loop());
           }
