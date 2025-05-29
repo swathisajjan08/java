@@ -326,50 +326,32 @@ function plantStage6({ id, row, t5, startTime }) {
 
 // main function -processes multiple plants
 function main(id) {
-	return new Promise((resolve,reject)=>{
-		plantStage1(id).then((result1)=>{
-			return new Promise((resolve,reject)=>{
-			resolve(plantStage2(result1))
-		})
-	}).then((result2)=>{
-		if (!result2){
-			return new Promise((resolve,reject)=>{
-				plantStage1(id)
-				.then(()=>{resolve()})
-				.catch((error)=>{reject(error)})
-	})
-} else{
-	return new Promise((resolve,reject)=>{
-resolve(plantStage3(result2))
-
-})
-}
-}).then((result3)=>{
-	return new Promise((resolve,reject)=>{
- resolve(plantStage4(result3))
-})
-}) .then((result4)=>{
-	return new Promise((resolve,reject)=>{
-		resolve(plantStage5(result4))
-})
-}).then((result5)=>{
-	return new Promise((resolve,reject)=>{
-resolve(plantStage6(result5))
-})
-	
-}).then(()=>{
-	resolve()
-}).catch((error)=>{
-	reject(error)
-})
-	})
+  return new Promise((resolve, reject) => {
+    plantStage1(id)
+      .then((result1) => plantStage2(result1))
+      .then((result2) => {
+        if (!result2.row) {
+          return plantStage1(id);
+        }
+        return plantStage3(result2);
+      })
+      .then((result3) => plantStage4(result3))
+      .then((result4) => plantStage5(result4))
+      .then((result5) => plantStage6(result5))
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
 
 //Function call for main and handler for callback functions
-main(265)
+main(266)
   .then(() => {
     console.log("all plants processed");
   })
   .catch((error) => {
-    console.log(error);
+    console.log("error",error);
   });
