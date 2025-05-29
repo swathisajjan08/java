@@ -44,12 +44,12 @@ function avgCapacity(row) {
       const average = total / rows.length;
       let current = row.site_capacity;
       // console.log("average", average)
-			const startTime = Date.now()
+      const startTime = Date.now();
       return new Promise((resolve) => {
         function loop() {
           if (current >= average) {
             row.site_capacity = current;
-						const timeUpgrade = (Date.now() - startTime)/1000
+            const timeUpgrade = (Date.now() - startTime) / 1000;
             return logtotestdb({
               delayTime: 0,
               plant_id: row.id,
@@ -58,15 +58,17 @@ function avgCapacity(row) {
               capacity: current,
               message: `Plant id ${row.id} capacity reached average value of ${current}. `,
             })
-						.then(()=>{logtotestdb({
-							delayTime: 0,
-							plant_id: row.id,
-							plant_name: row.name,
-							comnc_date: row.comm_date,
-							capacity: current,
-							message: `Total time taken to upgrade plant id ${row.id} is ${timeUpgrade}`,
-						})})
-						.then(() => resolve(row));
+              .then(() => {
+                logtotestdb({
+                  delayTime: 0,
+                  plant_id: row.id,
+                  plant_name: row.name,
+                  comnc_date: row.comm_date,
+                  capacity: current,
+                  message: `Total time taken to upgrade plant id ${row.id} is ${timeUpgrade}`,
+                });
+              })
+              .then(() => resolve(row));
           } else {
             const t1 = Date.now() % 2000;
             delayTimelog(t1, 10, "log", "2025-05-20", 0, `Delaying for  ${t1} ms while upgrading.`)
@@ -74,15 +76,14 @@ function avgCapacity(row) {
                 const previous = current;
                 current = current + 3;
 
-              	logtotestdb({
+                logtotestdb({
                   delayTime: 0,
                   plant_id: row.id,
                   plant_name: row.name,
                   comnc_date: row.comm_date,
                   capacity: current,
                   message: `Plant capacity of id ${row.id} incremented from ${previous} to ${current}.`,
-                })
-								
+                });
               })
               .then(() => loop());
           }
@@ -138,7 +139,7 @@ function fetchPlantFromDev(id) {
 }
 
 //Function to insert and update the plant data into my_db
-function insertIntomydb(c) {
+function insertIntoMydb(c) {
   return new Promise((resolve, reject) => {
     return createConnection(configj.my_db)
       .then((connection) => {
@@ -190,20 +191,20 @@ function insertIntomydb(c) {
 function plantStage1(id) {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
-    delayTimelog(500, 10, "log", "2025-05-20", 0, `Stage 1 - Waiting 500 ms before fetching the plant ID ${id}.`)
+    delayTimelog(500, 10, "*****", "2025-05-20", 0, `${id}-Stage 1 - Waiting 500 ms before fetching the plant ID ${id}.`)
       .then(() =>
         logtotestdb({
-          delayTime: 0,
+          delayTime: 500,
           plant_id: 10,
           plant_name: "log",
           comnc_date: "2025-05-20",
           capacity: 0,
-          message: `Preparing to fetch the plant id  ${id} from devdb.`,
+          message: `${id}-STAGE 1-Preparing to fetch the plant id  ${id} from devdb.`,
         })
       )
       .then(() => {
-        const t1 = Date.now() % 2000;
-        delayTimelog(t1, 10, "log", "2025-05-20", 0, `Stage 1 - additional wait of ${t1}ms before moving to Stage 2.`).then(() => {
+        const t1 = (Date.now() % 2000 ) + 250;
+        delayTimelog(t1, 10, "log", "2025-05-20", 0, `${id}-Stage 1 - additional wait of ${t1}ms before moving to Stage 2.`).then(() => {
           resolve({ id, t1, startTime });
         });
       })
@@ -216,34 +217,56 @@ function plantStage1(id) {
 
 //STAGE 2: Function call for FetchPlantFromDev to fetch the plant and check if the plant id is present or not
 function plantStage2({ id, t1, startTime }) {
-  return new Promise((resolve, reject) => {
-    delayTimelog(t1, 10, "log", "2025-05-20", 0, `Stage 2 - Waiting  ${t1}ms in 2nd stage before fetching the plant id ${id}.`)
+  return new Promise((stage2Resolve, stage2Reject) => {
+    delayTimelog(t1, 10, "log", "2025-05-20", 0, `${id}-Stage 2 - Waiting  ${t1}ms in 2nd stage before fetching the plant id ${id}.`)
       .then(() => fetchPlantFromDev(id))
       .then((rows) => {
         if (rows.length === 0) {
-           logtotestdb({
+          logtotestdb({
             delayTime: t1,
             plant_id: 10,
             plant_name: "log",
             comnc_date: "2025-05-20",
             capacity: 0,
-            message: `No data found for plant id ${id} in devdb.`,
+            message: `${id}-STAGE 2 - No data found for plant id ${id} in devdb.`,
           })
+            .then(() => {
+							const t2 = Date.now() % 2000;
+              return delayTimelog(t2, 10, "log", "2025-05-20", 0, `${id}-Stage 2 - Waiting for ${t2} after no data found for plant id ${id}`);
+            })
+						.then(()=>{
+							stage2Reject()
+						})
+        } else {
+          const row = rows[0];
+					logtotestdb({
+						delayTime: t1,
+						plant_id: row.id,
+						plant_name: row.name,
+						comnc_date: row.comm_date,
+						capacity: row.site_capacity,
+						message: `${id}-STAGE 2-fetched plant id ${id} from dev_db.`,
+					})
+					.then(()=>{
+          const t2 = (Date.now() % 2000)+250;
+          return delayTimelog(t2, 10, "log", "2025-05-20", 0, `${id}-Stage 2 - Waiting for ${t2} in 2nd stage after fetching plant id.`)
+					
+					.then(() => {
+            stage2Resolve({ id: id, row: row, t2: t2, startTime });
+          });
+				})
         }
-        const row = rows[0];
-        const t2 = Date.now() % 2000;
-        resolve({ id: id, row: row, t2: t2, startTime });
       })
-      .catch(() => {
-        reject();
-      });
+			.catch(()=>{
+				stage2Reject()
+			})
   });
 }
 
 //STAGE 3: Log and update the plant capacity
 function plantStage3({ id, row, t2, startTime }) {
   return new Promise((resolve, reject) => {
-    delayTimelog(t2, 10, "log", "2025-05-20", 0, `Stage 3 - Waiting for ${t2} in 3rd stage before logging fetched plant id.`)
+    delayTimelog(t2, 10, "log", "2025-05-20", 0, `${id}-Stage 3 - Waiting for ${t2} in 3rd stage before logging fetched plant id.`)
       .then(() =>
         logtotestdb({
           delayTime: t2,
@@ -251,14 +274,14 @@ function plantStage3({ id, row, t2, startTime }) {
           plant_name: row.name,
           comnc_date: row.comm_date,
           capacity: row.site_capacity,
-          message: `fetched plant id  ${id} from dev_db.`,
+          message: `${id}-STAGE 3-fetched plant id  ${id} from dev_db.`,
         })
       )
 
-      .then(() => avgCapacity(row))
-      .then((updatedRow) => {
-        const t3 = Date.now() % 2000;
-        return delayTimelog(t3, 10, "log", "2025-05-20", 0, `Stage 3 - Waiting ${t3}ms before proceeding to  stage 4.`).then(() => resolve({ id, row: updatedRow, t3, startTime }));
+      // .then(() => avgCapacity(row))
+      .then(() => {
+        const t3 = (Date.now() % 2000)+250;
+        return delayTimelog(t3, 10, "log", "2025-05-20", 0, `${id}-Stage 3 - Waiting ${t3}ms before proceeding to  stage 4.`).then(() => resolve({ id, row, t3, startTime }));
       })
       .catch(() => {
         reject();
@@ -269,7 +292,7 @@ function plantStage3({ id, row, t2, startTime }) {
 //STAGE 4: Log before inserting into my_db
 function plantStage4({ id, row, t3, startTime }) {
   return new Promise((resolve, reject) => {
-    delayTimelog(t3, 10, "log", "2025-05-20", 0, `Stage 4 - Waiting ${t3}ms before logging insert into my_db.`)
+    delayTimelog(t3, 10, "log", "2025-05-20", 0, `${id}-Stage 4 - Waiting ${t3}ms before logging insert into my_db.`)
       .then(() =>
         logtotestdb({
           delayTime: t3,
@@ -277,12 +300,12 @@ function plantStage4({ id, row, t3, startTime }) {
           plant_name: row.name,
           comnc_date: row.comm_date,
           capacity: row.site_capacity,
-          message: `Preparing to insert Plant id ${id} into my_db.`,
+          message: `${id}-STAGE 4-Preparing to insert Plant id ${id} into my_db.`,
         })
       )
       .then(() => {
-        const t4 = Date.now() % 2000;
-        return delayTimelog(t4, 10, "log", "2025-05-20", 0, `Stage 4 - Waiting ${t4}ms before starting Stage 5`).then(() => resolve({ id, row, t4, startTime }));
+        const t4 = (Date.now() % 2000)+250;
+        return delayTimelog(t4, 10, "log", "2025-05-20", 0, `${id}-Stage 4 - Waiting ${t4}ms before starting Stage 5`).then(() => resolve({ id, row, t4, startTime }));
       })
       .catch(() => {
         reject();
@@ -293,11 +316,11 @@ function plantStage4({ id, row, t3, startTime }) {
 //STAGE 5: Function call insertintomydb to insert into my_db
 function plantStage5({ id, row, t4, startTime }) {
   return new Promise((resolve, reject) => {
-    delayTimelog(t4, 10, "log", "2025-05-20", 0, `Stage 5 - Waiting  ${t4}ms before inserting into my_db `)
-      .then(() => insertIntomydb(row))
+    delayTimelog(t4, 10, "log", "2025-05-20", 0, `${id}-Stage 5 - Waiting  ${t4}ms before inserting into my_db `)
+      .then(() => insertIntoMydb(row))
       .then(() => {
-        const t5 = Date.now() % 2000;
-        return delayTimelog(t5, 10, "log", "2025-05-20", 0, `Stage 5 - Waiting ${t5}ms before starting Stage 6.`).then(() => resolve({ id, row, t5, startTime }));
+        const t5 = (Date.now() % 2000)+250;
+        delayTimelog(t5, 10, "log", "2025-05-20", 0, `${id}-Stage 5 - Waiting ${t5}ms before starting Stage 6.`).then(() => resolve({ id, row, t5, startTime }));
       })
       .catch(() => {
         reject();
@@ -308,24 +331,24 @@ function plantStage5({ id, row, t4, startTime }) {
 //STAGE 6: Final logging and calculate the total time taken.
 function plantStage6({ id, row, t5, startTime }) {
   return new Promise((resolve, reject) => {
-    delayTimelog(t5, 10, "log", "2025-05-20", 0, `Stage 6 - Waiting  ${t5}ms before logging inserted.`)
+    delayTimelog(t5, 10, "log", "2025-05-20", 0, `${id}-Stage 6 - Waiting  ${t5}ms before logging inserted.`)
       .then(() => {
         const totalTime = (Date.now() - startTime) / 1000;
-        logtotestdb({
+        return logtotestdb({
           delayTime: t5,
           plant_id: row.id,
           plant_name: row.name,
           comnc_date: row.comm_date,
           capacity: row.site_capacity,
-          message: `Successfully inserted  Plant id ${id} into mydb.`,
+          message: `${id}-STAGE 6- Successfully inserted  Plant id ${id} into mydb.`,
         }).then(() => {
-          logtotestdb({
+          return logtotestdb({
             delayTime: t5,
             plant_id: row.id,
             plant_name: row.name,
             comnc_date: row.comm_date,
             capacity: row.site_capacity,
-            message: `Total time taken for processing Plant id ${id} is ${totalTime}.`,
+            message: `${id}-STAGE 6-Total time taken for processing Plant id ${id} is ${totalTime}.`,
           });
         });
       })
@@ -338,32 +361,38 @@ function plantStage6({ id, row, t5, startTime }) {
 
 // main function -processes multiple plants
 function main(id) {
-  return new Promise((resolve, reject) => {
-    plantStage1(id)
-      .then((result1) => plantStage2(result1))
-      .then((result2) => {
-        if (!result2.row) {
-          return plantStage1(id);
-        }
-        return plantStage3(result2);
-      })
-      .then((result3) => plantStage4(result3))
-      .then((result4) => plantStage5(result4))
-      .then((result5) => plantStage6(result5))
-      .then(() => {
-        resolve();
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+  const stage1Promise = plantStage1(id); // calls the stage 1 function and stores the returned promise in the variable 
+  stage1Promise // when stage 1 is resolved after the delay is over and the values are ready, it will return result 1 which has id,t1
+    .then((result1) => {
+		const stage2Promise = plantStage2(result1)
+		return stage2Promise ;})
+    .then((result2) => {
+      if (!result2.row) {
+        reject();
+      }
+      const stage3Promise = plantStage3(result2)
+			return stage3Promise ;
+    })
+    .then((result3) =>{
+		const stage4Promise = plantStage4(result3)
+		return stage4Promise ;})
+    .then((result4) => {
+			const stage5Promise = plantStage5(result4)
+			return stage5Promise ;})
+    .then((result5) => {
+			const stage6Promise = plantStage6(result5)
+			return stage6Promise ;})
+    .then(() => {
+      if (id < 296) {
+        main(id + 1);
+      }
+    })
+    .catch((error) => {
+      if (id < 296) {
+        main(id + 1);
+      }
+    });
 }
 
 //Function call for main and handler for callback functions
-main(266)
-  .then(() => {
-    console.log("all plants processed");
-  })
-  .catch((error) => {
-    console.log("error",error);
-  });
+main(293);
