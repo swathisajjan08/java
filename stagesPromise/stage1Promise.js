@@ -41,3 +41,110 @@ const stage1Promise = () => {
 stage1Promise().then((message) => {
   console.log(message);
 });
+
+
+const stage2Promise = () => {
+  return new Promise((resolve, reject) => {
+    delayPromise().then((message) => {
+      console.log(message);
+      logPromise("STAGE 2(2)- fetching the plant").then((message) => {
+        console.log(message);
+        step3PromisePromise()
+          .then((message) => {
+            console.log(message);
+          })
+          .then(() => {
+            resolve("stage 2 is resolved");
+          });
+      });
+    });
+  });
+};
+stage2Promise().then((message) => {
+  console.log(message);
+});
+
+const stage3Promise = () => {
+  return new Promise((resolve, reject) => {
+    delayPromise().then((message) => {
+      console.log(message);
+      logPromise("STAGE 3(2)- finished fetching the plant").then((message) => {
+        console.log(message);
+        step3PromisePromise()
+          .then((message) => {
+            console.log(message);
+          })
+          .then(() => {
+            resolve("stage 3 is resolved");
+          });
+      });
+    });
+  });
+};
+stage3Promise().then((message) => {
+  console.log(message);
+});
+
+
+const stage4Promise = () => {
+  return new Promise((resolve, reject) => {
+    delayPromise().then((message) => {
+      console.log(message);
+      logPromise("STAGE 4(2)- Going to insert the plant").then((message) => {
+        console.log(message);
+        step3Promise()
+          .then((message) => {
+            console.log(message);
+          })
+          .then(() => {
+            resolve("stage 4 is resolved");
+          });
+      });
+    });
+  });
+};
+stage4Promise().then((message) => {
+  console.log(message);
+});
+
+const stage5Promise = () => {
+  return new Promise((resolve, reject) => {
+    delayPromise().then((message) => {
+      console.log(message);
+      logPromise("STAGE 5(2)- Inserting the plant").then((message) => {
+        console.log(message);
+        step3PromisePromise()
+          .then((message) => {
+            console.log(message);
+          })
+          .then(() => {
+            resolve("stage 5 is resolved");
+          });
+      });
+    });
+  });
+};
+stage5Promise().then((message) => {
+  console.log(message);
+});
+
+const stage6Promise = () => {
+  return new Promise((resolve, reject) => {
+    delayPromise().then((message) => {
+      console.log(message);
+      logPromise("STAGE 6(2)- Finished inserting into mydb").then((message) => {
+        console.log(message);
+        step3Promise()
+          .then((message) => {
+            console.log(message);
+          })
+          .then(() => {
+            resolve("stage 6 is resolved");
+          });
+      });
+    });
+  });
+};
+stage6Promise().then((message) => {
+  console.log(message);
+});
