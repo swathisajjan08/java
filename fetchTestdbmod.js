@@ -36,6 +36,7 @@ function avgCapacity(row) {
       return connection.execute("SELECT site_capacity FROM mas_sites WHERE site_capacity > 50");
     })
     .then(([rows]) => {
+			connection.end()
       let total = 0;
       for (let i = 0; i < rows.length; i++) {
         total = total + rows[i].site_capacity;
@@ -115,6 +116,7 @@ function logtotestdb({ delayTime, plant_id = 10, plant_name = "log", comnc_date 
       })
       .then(() => {
         resolve();
+				connection.end()
       })
       .catch(() => {
         reject();
@@ -131,6 +133,7 @@ function fetchPlantFromDev(id) {
       })
       .then(([rows]) => {
         resolve(rows);
+				connection.end()
       })
       .catch(() => {
         reject();
@@ -180,6 +183,7 @@ function insertIntoMydb(c) {
       })
       .then(() => {
         resolve();
+				connection.end()
       })
       .catch(() => {
         reject();
@@ -248,7 +252,7 @@ function plantStage2({ id, t1, startTime }) {
             message: `${id}-STAGE 2-fetched plant id ${id} from dev_db.`,
           }).then(() => {
             const t2 = (Date.now() % 2000) + 250;
-            return delayTimelog(t2, 10, "log", "2025-05-20", 0, `${id}-Stage 2 - Waiting for ${t2} in 2nd stage after fetching plant id.`).then(() => {
+            delayTimelog(t2, 10, "log", "2025-05-20", 0, `${id}-Stage 2 - Waiting for ${t2} in 2nd stage after fetching plant id.`).then(() => {
               stage2Resolve({ id: id, row: row, t2: t2, startTime });
             });
           });
@@ -278,7 +282,7 @@ function plantStage3({ id, row, t2, startTime }) {
       // .then(() => avgCapacity(row))
       .then(() => {
         const t3 = (Date.now() % 2000) + 250;
-        return delayTimelog(t3, 10, "log", "2025-05-20", 0, `${id}-Stage 3 - Waiting ${t3}ms before proceeding to  stage 4.`).then(() => resolve({ id, row, t3, startTime }));
+        delayTimelog(t3, 10, "log", "2025-05-20", 0, `${id}-Stage 3 - Waiting ${t3}ms before proceeding to  stage 4.`).then(() => resolve({ id, row, t3, startTime }));
       })
       .catch(() => {
         reject();
@@ -302,7 +306,7 @@ function plantStage4({ id, row, t3, startTime }) {
       )
       .then(() => {
         const t4 = (Date.now() % 2000) + 250;
-        return delayTimelog(t4, 10, "log", "2025-05-20", 0, `${id}-Stage 4 - Waiting ${t4}ms before starting Stage 5`).then(() => resolve({ id, row, t4, startTime }));
+        delayTimelog(t4, 10, "log", "2025-05-20", 0, `${id}-Stage 4 - Waiting ${t4}ms before starting Stage 5`).then(() => resolve({ id, row, t4, startTime }));
       })
       .catch(() => {
         reject();
@@ -367,19 +371,16 @@ function plantStage6({ id, row, t5, startTime }) {
 
 // main function -processes multiple plants
 function main(id) {
+	console.log(id)
   const stage1Promise = plantStage1(id); // calls the stage 1 function and stores the returned promise in the variable
   stage1Promise // stage 1 promise is resolved after the delay is over and the values are ready, it will return result 1 which has id,t1
     .then((result1) => {
-      // it is used to handle the result when the previous promise is resolved,result 1 od stage1 passed to stage 2
+      // it is used to handle the result when the previous promise is resolved,result 1 of stage1 passed to stage 2
       const stage2Promise = plantStage2(result1); // returns a promise, if data is found it resolves with result 2
       return stage2Promise;
     })
     .then((result2) => {
       //contains the resolved value from stage2
-      if (!result2.row) {
-        //if no data found , it rejects the promise, and jumps to .catch
-        reject();
-      }
       const stage3Promise = plantStage3(result2); // uses the result of stage2
       return stage3Promise; // returns another promise
     })
@@ -387,7 +388,7 @@ function main(id) {
       //resolved once the logs are completed
       const stage4Promise = plantStage4(result3); //receive a resolved value from the previous stage,calls stage 4 function
       return stage4Promise;
-    }) //returns a promise that resolved when resolved
+    }) //returns a promise that returns result4 when resolved
     .then((result4) => {
       const stage5Promise = plantStage5(result4);
       return stage5Promise;
@@ -397,18 +398,22 @@ function main(id) {
       return stage6Promise;
     }) // stage 6 does not return anything, it just logs and complete
     .then(() => {
-      // after all stages re complete, check if more ids to process
+      // after all stages are complete, check if more ids to process
       if (id < 296) {
-        main(id + 1); // repeat the process for next plant
-      }
+         main(id + 1); // repeat the process for next plant
+      } else {
+				return "exist"
+			}
     })
     .catch((error) => {
       // any stage throws error or rejects, catch block will handle
       if (id < 296) {
         main(id + 1); //process to next plant
-      }
+      } else {
+				return "exist"
+			}
     });
 }
 
 //Function call for main and handler for callback functions
-main(293);
+main(294)

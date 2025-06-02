@@ -1,0 +1,78 @@
+Stage 1: Initial Delay and Logging
+Step 1: Wait for a delay of 500 ms.
+
+Step 2: Log a message saying "going to fetch the plant of {id} from devdb".
+
+Step 3: Generate a random delay t1 = Date.now() % 2000.
+
+Step 4: Wait for t1  before moving to Stage 2.
+
+Stage 2: Fetch Plant and Prepare for Next
+Step 1: Wait for t1 .
+
+Step 2: Try to fetch the plant with that id from the dev_db database.
+
+Step 3: If the plant doesn't exist, log "No such {id} from devdb" and skip to the next id.
+
+Step 4: If it exists, generate another delay t2 = Date.now() % 2000.
+
+Stage 3: Log Fetched Plant Info
+Step 1: Wait for t2 milliseconds.
+
+Step 2: Log that the plant was fetched.
+
+Step 3: Generate a new delay t3 = Date.now() % 2000.
+
+Step 4: Wait for t3 before moving to Stage 4.
+
+Stage 4: Prepare to Insert
+Step 1: Wait for t3.
+
+Step 2: Log going to insert into mydb.
+
+Step 3: Generate a delay t4 = Date.now() % 2000.
+
+Step 4: Wait for t4 before moving to Stage 5.
+
+Stage 5: Insert into Database
+Step 1: Wait for t4.
+
+Step 2: Insert the plant data into mydb.
+
+Step 3: Generate delay t5 = Date.now() % 2000.
+
+Step 4: Wait for t5 before moving to Stage 6.
+
+Stage 6: Final Logging
+Step 1: Wait for t5.
+
+Step 2: Log that the plant with that id was inserted.
+
+Main Function
+Starts from id = 295 
+For each id:
+Goes through all 6 stages.
+If a plant is not found, skips and moves to the next one.
+Continues until all plants are done.
+
+
+new plan:
+
+stage: average capacity of each plant id
+
+Step 1: Connect to the database
+Step 2: Get all plants 
+Step 3: Calculate the average,
+Loop through the result,
+Add each plant capacity to a total,
+Count how many plants you saw,
+Divide the total by the count 
+Step 4: Get the current plant’s capacity
+Step 5: Start a loop,
+ is the current capacity less than the average?
+If yes, then:
+Add 3 to the current capacity
+Log the update
+Repeat the loop using .then(() => loop())
+If no,then:
+Log a final message that the capacity is uploaded.

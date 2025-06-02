@@ -39,8 +39,6 @@ const stage1Promise = () => {
   });
 };
 
-
-
 const stage2Promise = () => {
   return new Promise((resolve, reject) => {
     step3Promise().then((message) => {
@@ -58,7 +56,6 @@ const stage2Promise = () => {
     });
   });
 };
-
 
 const stage3Promise = () => {
   return new Promise((resolve, reject) => {
@@ -78,8 +75,6 @@ const stage3Promise = () => {
   });
 };
 
-
-
 const stage4Promise = () => {
   return new Promise((resolve, reject) => {
     step3Promise().then((message) => {
@@ -97,7 +92,6 @@ const stage4Promise = () => {
     });
   });
 };
-
 
 const stage5Promise = () => {
   return new Promise((resolve, reject) => {
@@ -117,7 +111,6 @@ const stage5Promise = () => {
   });
 };
 
-
 const stage6Promise = () => {
   return new Promise((resolve, reject) => {
     step3Promise().then((message) => {
@@ -136,37 +129,36 @@ const stage6Promise = () => {
   });
 };
 
-
-
-const stages = () =>{
-return new Promise((resolve,reject)=>{
-stage1Promise().then((message) => {
-  console.log(message);
-  stage2Promise().then((message) => {
-    console.log(message);
-    stage3Promise().then((message) => {
+const stages = () => {
+  return new Promise((resolve, reject) => {
+    stage1Promise().then((message) => {
       console.log(message);
-      stage4Promise().then((message) => {
+      stage2Promise().then((message) => {
         console.log(message);
-        stage5Promise().then((message) => {
+        stage3Promise().then((message) => {
           console.log(message);
-          stage6Promise().then((message) => {
+          stage4Promise().then((message) => {
             console.log(message);
-          })
-          .then(()=>{
-            resolve("All stages are resolved")
-          })
-          .catch((error)=>{
-            reject("error",error)
-          })
+            stage5Promise().then((message) => {
+              console.log(message);
+              stage6Promise()
+                .then((message) => {
+                  console.log(message);
+                })
+                .then(() => {
+                  resolve("All stages are resolved");
+                })
+                .catch((error) => {
+                  reject("error", error);
+                });
+            });
+          });
         });
       });
     });
   });
-})
-})
-}
+};
 
-stages().then((message)=>{
-  console.log(message)
-})
+stages().then((message) => {
+  console.log(message);
+});

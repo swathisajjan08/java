@@ -30,8 +30,6 @@ const stage1Promise = () => {
         step3Promise()
           .then((message) => {
             console.log(message);
-          })
-          .then(() => {
             resolve("stage 1 is resolved");
           });
       });
