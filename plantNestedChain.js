@@ -130,7 +130,7 @@ const step3Promise = (delay, id, stagenumber) => {
   });
 };
 
-const stage1Promise = (id) => {
+const p1 = (id) => {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     delayPromise(500, id).then(() => {
@@ -144,7 +144,7 @@ const stage1Promise = (id) => {
   });
 };
 
-const stage2Promise = ({ id, startTime, t1 }) => {
+const p2 = ({ id, startTime, t1 }) => {
   return new Promise((resolve, reject) => {
     step3Promise(t1, id, 2).then(() => {
       fetchFromDev(id).then((rows) => {
@@ -176,7 +176,7 @@ const stage2Promise = ({ id, startTime, t1 }) => {
   });
 };
 
-const stage3Promise = ({ t2, id, row, startTime }) => {
+const p3 = ({ t2, id, row, startTime }) => {
   return new Promise((resolve, reject) => {
     step3Promise(t2, id, 3).then(() => {
       logPromise({
@@ -189,18 +189,87 @@ const stage3Promise = ({ t2, id, row, startTime }) => {
       }).then(() => {
         const t3 = Date.now() % 2000;
         step3Promise(t3, id, 3).then(() => {
-          resolve({ message: `stage 3 is resolved for plant id ${id}`, t3, startTime });
+          resolve({ t3, id, row, startTime });
+        });
+      });
+    });
+  });
+};
+const p4 = ({ t3, id, row, startTime }) => {
+  return new Promise((resolve, reject) => {
+    step3Promise(t3, id, 4).then(() => {
+      logPromise({
+        delayTime: t3,
+        plant_id: row.id,
+        plant_name: row.name,
+        comnc_date: row.comm_date,
+        capacity: row.site_capacity,
+        message: `${id}-STAGE 4 - Preparing to insert Plant id ${id} into my_db.`,
+      }).then(() => {
+        const t4 = Date.now() % 2000;
+        step3Promise(t4, id, 4).then(() => {
+          resolve({ t4, row, id, startTime });
         });
       });
     });
   });
 };
 
+const p5 = ({ t4, row, id, startTime }) => {
+  return new Promise((resolve, reject) => {
+    step3Promise(t4, id, 5).then(() => {
+      insertIntoMydb(row).then(() => {
+        logPromise({
+          delayTime: t4,
+          plant_id: row.id,
+          plant_name: row.name,
+          comnc_date: row.comm_date,
+          capacity: row.site_capacity,
+          message: `${id}-STAGE 5 - Inserting Plant id ${id} into mydb.`,
+        }).then(() => {
+          const t5 = Date.now() % 2000;
+          step3Promise(t5, id, 5).then(() => {
+            resolve({ t5, id, row, startTime });
+          });
+        });
+      });
+    });
+  });
+};
+
+const p6 = ({ t5, id, row, startTime }) => {
+  return new Promise((resolve, reject) => {
+    step3Promise(t5, id, 6).then(() => {
+      logPromise({
+        delayTime: t5,
+        plant_id: row.id,
+        plant_name: row.name,
+        comnc_date: row.comm_date,
+        capacity: row.site_capacity,
+        message: `${id}-STAGE 6 - Successfully inserted  Plant id ${id} into mydb.`,
+      }).then(() => {
+        const t6 = Date.now() % 2000;
+        step3Promise(t6, id, 6).then(() => {
+          const totalTime = (startTime - Date.now()) / 1000;
+          logPromise({
+            delayTime: t5,
+            plant_id: row.id,
+            plant_name: row.name,
+            comnc_date: row.comm_date,
+            capacity: row.site_capacity,
+            message: `${id}-STAGE 6-Total time taken for processing Plant id ${id} is ${totalTime}.`,
+          });
+          resolve({ message: `all stages are resolved for plant id ${id}` });
+        });
+      });
+    });
+  });
+};
 const main = (id) => {
   const stages = (id) => {
-    return new Promise((resolve, reject) => {
-      stage1Promise(id).then(stage2Promise).then(stage3Promise).then(resolve).catch(reject);
-    });
+    // return new Promise((resolve,reject)=>{
+    return p1(id).then(p2).then(p3).then(p4).then(p5).then(p6);
+    // })
   };
 
   stages(id)
