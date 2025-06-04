@@ -129,7 +129,7 @@ const step3Promise = async (delay, id, stagenumber) => {
 
 const p1 = (id) => {
   return new Promise((resolve, reject) => {
-    (async () => {
+    const asyncP1 = async () =>{
       try {
         const startTime = Date.now();
         await delayPromise(500, id);
@@ -140,13 +140,14 @@ const p1 = (id) => {
       } catch (error) {
         reject(error);
       }
-    })();
+    }
+    asyncP1();
   });
 };
 
 const p2 = ({ id, startTime, t1 }) => {
   return new Promise((resolve, reject) => {
-    (async () => {
+ const asyncP2 =async () => {
       try {
         await step3Promise(t1, id, 2);
         const rows = await fetchFromDev(id);
@@ -173,13 +174,14 @@ const p2 = ({ id, startTime, t1 }) => {
       } catch (error) {
         reject(error);
       }
-    })();
+    } 
+    asyncP2();
   });
 };
 
 const p3 = ({ t2, id, row, startTime }) => {
   return new Promise((resolve, reject) => {
-    (async () => {
+    const asyncP3 = async () => {
       try {
         await step3Promise(t2, id, 3);
         await logPromise({
@@ -196,13 +198,14 @@ const p3 = ({ t2, id, row, startTime }) => {
       } catch (error) {
         reject(error);
       }
-    })();
+    }
+    asyncP3();
   });
 };
 
 const p4 = ({ t3, id, row, startTime }) => {
   return new Promise((resolve, reject) => {
-    (async () => {
+    const asyncP4 =async () => {
       try {
         await step3Promise(t3, id, 4);
         await logPromise({
@@ -219,13 +222,14 @@ const p4 = ({ t3, id, row, startTime }) => {
       } catch (error) {
         reject(error);
       }
-    })();
+    }
+    asyncP4();
   });
 };
 
 const p5 = ({ t4, row, id, startTime }) => {
   return new Promise((resolve, reject) => {
-    (async () => {
+    const asyncP5 = async () => {
       try {
         await step3Promise(t4, id, 5);
         await insertIntoMydb(row);
@@ -243,13 +247,14 @@ const p5 = ({ t4, row, id, startTime }) => {
       } catch (error) {
         reject(error);
       }
-    })();
+    }
+    asyncP5();
   });
 };
 
 const p6 = ({ t5, id, row, startTime }) => {
   return new Promise((resolve, reject) => {
-    (async () => {
+    const asyncP6=async () => {
       try {
         await step3Promise(t5, id, 6);
         await logPromise({
@@ -275,7 +280,8 @@ const p6 = ({ t5, id, row, startTime }) => {
       } catch (error) {
         reject(error);
       }
-    })();
+    }
+    asyncP6();
   });
 };
 
