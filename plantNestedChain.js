@@ -265,25 +265,27 @@ const p6 = ({ t5, id, row, startTime }) => {
     });
   });
 };
-const main = (id) => {
-  const stages = (id) => {
-    // return new Promise((resolve,reject)=>{
-    return p1(id).then(p2).then(p3).then(p4).then(p5).then(p6);
-    // })
-  };
-
-  stages(id)
+const stages = (id) => {
+  // return new Promise((resolve,reject)=>{
+  p1(id)
+    .then(p2)
+    .then(p3)
+    .then(p4)
+    .then(p5)
+    .then(p6)
     .then((message) => {
       console.log(message);
       if (id < 295) {
-        main(id + 1);
+        stages(id + 1);
       }
     })
     .catch((error) => {
       console.log(error);
       if (id < 295) {
-        main(id + 1);
+        stages(id + 1);
       }
     });
+  // })
 };
-main(293);
+
+stages(293);
