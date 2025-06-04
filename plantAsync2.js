@@ -285,8 +285,7 @@ const p6 = ({ t5, id, row, startTime }) => {
   });
 };
 
-const stages = (id) => {
-    const asyncStages = async () => {
+const stages = async (id) => {
         try {
             const result1 = await p1(id);
             const result2 = await p2(result1);
@@ -302,9 +301,7 @@ const stages = (id) => {
               stages(id + 1);
             }
           }
-        }
-        asyncStages()
-
+        
     }
 
 stages(293);
