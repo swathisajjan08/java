@@ -4,10 +4,14 @@ function* plantId(i) {
   }
 }
 
-const gen = plantId(295);
-let id = gen.next();
-
-while (!id.done) {
+function iterate(gen) {
+  const id = gen.next();
+  if (id.done) {
+    return;
+  }
   console.log(id.value);
-  id = gen.next();
+  iterate(gen);
 }
+
+const gen = plantId(295);
+iterate(gen);
