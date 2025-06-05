@@ -1,15 +1,13 @@
-function* plantid(){
-    for(let i=293;i<300;i++){
-        yield i
-    }
-} 
+function* plantId(i) {
+  while (i < 300) {
+    yield i++;
+  }
+}
 
-const gen = plantid()
-console.log(gen.next())
-console.log(gen.next())
-console.log(gen.next())
-console.log(gen.next())
-console.log(gen.next())
-console.log(gen.next())
-console.log(gen.next())
-console.log(gen.next())
+const gen = plantId(295);
+let id = gen.next();
+
+while (!id.done) {
+  console.log(id.value);
+  id = gen.next();
+}
