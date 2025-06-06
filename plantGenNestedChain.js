@@ -266,31 +266,73 @@ const p6 = ({ t5, id, row, startTime }) => {
   });
 };
 
-function* stages(id) {
-  while (id < 296) {
-    yield id++;
-  }
+// function* genPlantId() {
+//   let id = 293;
+//   console.log("starting of gen function");
+//   while (id < 296) {
+//     console.log("halting at", Date.now());
+//     yield id++;
+//     console.log("yielding at", Date.now());
+//   }
+//   console.log("ending of gen function");
+// }
+// function plantId() {
+//   let id = 293;
+//   while (id < 296) {
+//     console.log(id);
+//     id++;
+//   }
+// }
+// function iterate(gen) {
+//   const id = gen.next();
+//   if (!id.done) {
+//     p1(id.value)
+//       .then(p2)
+//       .then(p3)
+//       .then(p4)
+//       .then(p5)
+//       .then(p6)
+//       .then((message) => {
+//         console.log(message);
+//         iterate(gen);
+//       })
+//       .catch((error) => {
+//         console.log(error);
+//         iterate(gen);
+//       });
+//   }
+// }
+
+// const gen = genPlantId();
+// const v = plantId();
+// iterate(gen);
+
+function* getPromises() {
+  yield p1;
+  yield p2;
+  yield p3;
+  yield p4;
+  yield p5;
+  yield p6;
 }
 
-function iterate(gen) {
-  const id = gen.next();
-  if (!id.done) {
-    p1(id.value)
-      .then(p2)
-      .then(p3)
-      .then(p4)
-      .then(p5)
-      .then(p6)
-      .then((message) => {
-        console.log(message);
-        iterate(gen);
-      })
-      .catch((error) => {
-        console.log(error);
-        iterate(gen);
-      });
-  }
-}
-
-const gen = stages(293);
-iterate(gen);
+const exec = (id) => {
+  const gen = getPromises();
+  console.log(id);
+  const nextStage = (result) => {
+    const p = gen.next();
+    if (!p.done) {
+      p.value(result)
+        .then((result) => {
+          //   console.log(result);
+          nextStage(result);
+        })
+        .catch((error) => {
+          console.log(error);
+          exec(id + 1);
+        });
+    }
+  };
+  nextStage(id);
+};
+exec(293);
