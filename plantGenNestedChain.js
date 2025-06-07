@@ -250,7 +250,7 @@ const p6 = ({ t5, id, row, startTime }) => {
       }).then(() => {
         const t6 = Date.now() % 2000;
         step3Promise(t6, id, 6).then(() => {
-          const totalTime = (startTime - Date.now()) / 1000;
+          const totalTime = ( Date.now() - startTime) / 1000;
           logPromise({
             delayTime: t5,
             plant_id: row.id,
@@ -259,80 +259,51 @@ const p6 = ({ t5, id, row, startTime }) => {
             capacity: row.site_capacity,
             message: `${id}-STAGE 6-Total time taken for processing Plant id ${id} is ${totalTime}.`,
           });
-          resolve({ message: `all stages are resolved for plant id ${id}` });
+          resolve({ message: `all stages are resolved for plant id ${id}`, completed: true, id:id});
         });
       });
     });
   });
 };
 
-// function* genPlantId() {
-//   let id = 293;
-//   console.log("starting of gen function");
-//   while (id < 296) {
-//     console.log("halting at", Date.now());
-//     yield id++;
-//     console.log("yielding at", Date.now());
-//   }
-//   console.log("ending of gen function");
-// }
-// function plantId() {
-//   let id = 293;
-//   while (id < 296) {
-//     console.log(id);
-//     id++;
-//   }
-// }
-// function iterate(gen) {
-//   const id = gen.next();
-//   if (!id.done) {
-//     p1(id.value)
-//       .then(p2)
-//       .then(p3)
-//       .then(p4)
-//       .then(p5)
-//       .then(p6)
-//       .then((message) => {
-//         console.log(message);
-//         iterate(gen);
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//         iterate(gen);
-//       });
-//   }
-// }
-
-// const gen = genPlantId();
-// const v = plantId();
-// iterate(gen);
 
 function* getPromises() {
+let id = 293
+ while(id<297){
   yield p1;
   yield p2;
   yield p3;
   yield p4;
   yield p5;
   yield p6;
+  id++;
+ }
 }
 
-const exec = (id) => {
-  const gen = getPromises();
-  console.log(id);
-  const nextStage = (result) => {
-    const p = gen.next();
-    if (!p.done) {
-      p.value(result)
-        .then((result) => {
-          //   console.log(result);
-          nextStage(result);
-        })
-        .catch((error) => {
-          console.log(error);
-          exec(id + 1);
-        });
-    }
-  };
-  nextStage(id);
-};
+let gen = getPromises();   
+function exec(id) {
+  const p = gen.next();
+  if (!p.done) {
+    p.value(id).then((result) => {
+      console.log(result);
+      exec(result);
+    }).catch((error)=>{
+        console.log(error)
+        exec(id)
+
+    })
+  } else{
+    if(id<297){
+    gen = getPromises();
+    gen.next()
+    exec(id+1)
+
+    } 
+}
+}
+    
 exec(293);
+
+
+
+
