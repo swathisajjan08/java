@@ -250,7 +250,7 @@ const p6 = ({ t5, id, row, startTime }) => {
       }).then(() => {
         const t6 = Date.now() % 2000;
         step3Promise(t6, id, 6).then(() => {
-          const totalTime = ( Date.now() - startTime) / 1000;
+          const totalTime = (Date.now() - startTime) / 1000;
           logPromise({
             delayTime: t5,
             plant_id: row.id,
@@ -259,51 +259,52 @@ const p6 = ({ t5, id, row, startTime }) => {
             capacity: row.site_capacity,
             message: `${id}-STAGE 6-Total time taken for processing Plant id ${id} is ${totalTime}.`,
           });
-          resolve({ message: `all stages are resolved for plant id ${id}`, completed: true, id:id});
+          resolve({ message: `all stages are resolved for plant id ${id}` });
         });
       });
     });
   });
 };
 
-
 function* getPromises() {
-let id = 293
- while(id<297){
-  yield p1;
-  yield p2;
-  yield p3;
-  yield p4;
-  yield p5;
-  yield p6;
-  id++;
- }
+  yield { id: 1, promise: p1 };
+  yield { id: 2, promise: p2 };
+  yield { id: 3, promise: p3 };
+  yield { id: 4, promise: p4 };
+  yield { id: 5, promise: p5 };
+  yield { id: 6, promise: p6 };
 }
 
-let gen = getPromises();   
-function exec(id) {
-  const p = gen.next();
-  if (!p.done) {
-    p.value(id).then((result) => {
-      console.log(result);
-      exec(result);
-    }).catch((error)=>{
-        console.log(error)
-        exec(id)
-
-    })
-  } else{
-    if(id<297){
-    gen = getPromises();
-    gen.next()
-    exec(id+1)
-
-    } 
-}
-}
-    
+let gen = getPromises();
+const exec = (id, payload) => {
+  const v = gen.next();
+  if (!v.done) {
+    if (v.value.id === 1) {
+      v.value
+        .promise(id)
+        .then((output) => {
+          exec(id, output);
+        })
+        .catch(() => {
+          gen = getPromises();
+          exec(id + 1);
+        });
+    } else {
+      v.value
+        .promise(payload)
+        .then((output) => {
+          exec(id, output);
+        })
+        .catch(() => {
+          gen = getPromises();
+          exec(id + 1);
+        });
+    }
+  } else {
+    if (id < 296) {
+      gen = getPromises();
+      exec(id + 1);
+    }
+  }
+};
 exec(293);
-
-
-
-
