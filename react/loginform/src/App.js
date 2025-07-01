@@ -22,7 +22,7 @@ function App() {
       if (!response.ok) {
         alert(`Login failed: ${data.error}`);
       } else {
-        alert("Login successful!");
+        alert("Login successful!, after");
         window.location.href = "http://localhost:4000/plantid";
       }
     } catch (error) {
