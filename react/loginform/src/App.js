@@ -41,14 +41,14 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(`Error: ${data.error || 'Plant not found'}`);
+        alert("plant not found");
         setPlantData(null);
       } else {
         setPlantData(data);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
-      alert("Failed to fetch plant data.");
+      console.error("Fetch error", error);
+
       setPlantData(null);
     }
   };
@@ -69,7 +69,7 @@ function App() {
                         type="text"
                         className="form-control"
                         value={plantId}
-                        onChange={(e) => setPlantId(e.target.value)}
+                        onChange={(event) => setPlantId(event.target.value)}
                         required
                       />
                     </div>
