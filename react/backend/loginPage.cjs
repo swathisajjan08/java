@@ -4,7 +4,7 @@ const cors = require("cors");
 const app = express(); // create an express server object and save it as apps
 app.use(express.json());//Express to automatically parse incoming requests with JSON payloads
 app.use(cors({
-  origin: "https://loginbackend-2uec.onrender.com",
+  origin: 'https://frontend-8zjg.onrender.com',
   methods: ["GET", "POST"],
   credentials: true
 }));
