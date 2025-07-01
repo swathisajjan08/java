@@ -9,7 +9,7 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch("https://loginbackend-2uec.onrender.com", {
+      const response = await fetch("https://loginbackend-2uec.onrender.com/loginpage", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
