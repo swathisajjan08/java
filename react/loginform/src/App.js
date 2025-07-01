@@ -23,7 +23,7 @@ function App() {
         alert(`Login failed: ${data.error}`);
       } else {
         alert("Login successful!");
-        window.location.href = "http://localhost:4000/plantid";
+        // window.location.href = "http://localhost:4000/plantid";
       }
     } catch (error) {
       console.log(error.message);
