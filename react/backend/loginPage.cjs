@@ -43,7 +43,7 @@ app.post("/loginpage", (req, res) => {
 app.get("/plantid", (req, res) => {
   const id = req.query.id;
 
-db.query("SELECT * FROM mas_sites WHERE id = ?", [id], (error, results) => {
+db.query("SELECT name FROM mas_sites WHERE id = ?", [id], (error, results) => {
     if (error) {
       console.log(error);
       res.status(500).send("error");
