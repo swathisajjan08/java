@@ -20,6 +20,10 @@ const db = mysql2.createConnection({
 });
 db.connect();
 
+app.get("/", (req, res) => {
+  res.send("Backend running!");
+});
+
 app.post("/loginpage", (req, res) => {
   const { email, password } = req.body;
 
