@@ -3,11 +3,13 @@ const mysql2 = require("mysql2");
 const cors = require("cors");
 const app = express(); // create an express server object and save it as apps
 app.use(express.json());//Express to automatically parse incoming requests with JSON payloads
-app.use(cors({
-  origin: 'https://frontend-8zjg.onrender.com',
-  methods: ["GET", "POST"],
-  credentials: true
-}));
+// app.use(cors({
+//   origin: 'https://frontend-8zjg.onrender.com',
+//   methods: ["GET", "POST"],
+//   credentials: true
+// }));
+app.use(cors());
+
 app.use(express.urlencoded({ extended: true }));
 
 const db = mysql2.createConnection({
